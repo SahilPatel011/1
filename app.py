@@ -10,7 +10,7 @@ st.set_page_config(page_title="AI On-Screen Marking System", layout="wide")
 # --- ✨ IMAGE_F2AB05.PNG INSPIRED FUTURISTIC NEON PURPLE THEME ---
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600&family=Plus+Jakarta+Sans:wght=500;700&display=swap');
     
     /* Pitch Black Background like image_f2ab05.png */
     .stApp {
@@ -145,13 +145,19 @@ elif ai_provider == "Groq Cloud (Llama 3)":
 elif ai_provider == "Cohere API":
     model_choice = st.sidebar.selectbox("Select Model:", ["command-r-plus"])
 
-# Core Prompt Logic
+# Core Prompt Logic with Strict Image Verification Guardrails
 SYSTEM_PROMPT = """
 You are an expert Board Exam Evaluator with 20+ years of experience grading high-stakes secondary and senior secondary school examinations (specifically specializing in Mathematics, Physics, and Chemistry). Your core mission is to grade student answers with extreme accuracy, absolute lack of bias, and a strict adherence to partial-marking (step-marking) rules.
 
+⚠️ CRITICAL GUARDRAIL (IMAGE VERIFICATION):
+Before grading, analyze the uploaded image carefully. If the image is NOT a handwritten or printed student answer sheet, or if it is a random photo (like scenery, furniture, animals, farms, selfies, or blank pages) that has absolutely no relation to the written educational content, you MUST strictly do the following:
+1. Set "total_marks_awarded" to 0.
+2. Keep the "step_by_step_breakdown" array completely empty [].
+3. In "final_summary", write exactly this message: "ERROR: The uploaded image does not contain a valid student answer sheet. Please upload a clear image of the handwritten exam paper."
+
 Output MUST be valid JSON data matching this schema:
 {
-  "total_marks_awarded": 1.5,
+  "total_marks_awarded": 0.0,
   "max_marks": 2.0,
   "step_by_step_breakdown": [
     {
@@ -164,7 +170,7 @@ Output MUST be valid JSON data matching this schema:
       "feedback": "Reasoning"
     }
   ],
-  "final_summary": "Constructive overview text"
+  "final_summary": "Constructive overview text or error message"
 }
 """
 
@@ -256,20 +262,28 @@ with col2:
                     
                     # --- DISPLAY RESULTS ---
                     if result_json:
-                        st.success("Evaluation Completed Successfully!")
-                        
-                        score_col1, score_col2 = st.columns(2)
-                        score_col1.metric("MARKS AWARDED", f"{result_json.get('total_marks_awarded')} / {result_json.get('max_marks')}")
-                        
-                        st.markdown("### 📝 STEP-BY-STEP BREAKDOWN")
-                        for step in result_json.get("step_by_step_breakdown", []):
-                            with st.expander(f"Step {step.get('step_number')}: {step.get('description')} ({step.get('marks_awarded')}/{step.get('marks_allocated')} Marks)"):
-                                st.write(f"**Expected:** {step.get('expected_content')}")
-                                st.write(f"**Student Wrote:** {step.get('student_content')}")
-                                st.info(f"**AI Notes:** {step.get('feedback')}")
-                                
-                        st.markdown("### 🧐 SUMMARY FEEDBACK")
-                        st.info(result_json.get("final_summary"))
+                        # Check if AI triggered the error guardrail
+                        summary_text = result_json.get("final_summary", "")
+                        if "ERROR:" in summary_text:
+                            st.error(summary_text)
+                            st.metric("MARKS AWARDED", f"0.0 / {max_marks}")
+                        else:
+                            st.success("Evaluation Completed Successfully!")
+                            score_col1, score_col2 = st.columns(2)
+                            score_col1.metric("MARKS AWARDED", f"{result_json.get('total_marks_awarded')} / {result_json.get('max_marks')}")
+                            
+                            st.markdown("### 📝 STEP-BY-STEP BREAKDOWN")
+                            if result_json.get("step_by_step_breakdown"):
+                                for step in result_json.get("step_by_step_breakdown", []):
+                                    with st.expander(f"Step {step.get('step_number')}: {step.get('description')} ({step.get('marks_awarded')}/{step.get('marks_allocated')} Marks)"):
+                                        st.write(f"**Expected:** {step.get('expected_content')}")
+                                        st.write(f"**Student Wrote:** {step.get('student_content')}")
+                                        st.info(f"**AI Notes:** {step.get('feedback')}")
+                            else:
+                                st.write("No steps evaluated.")
+                                    
+                            st.markdown("### 🧐 SUMMARY FEEDBACK")
+                            st.info(summary_text)
                         
                 except Exception as e:
                     st.error(f"An execution error occurred: {e}")
