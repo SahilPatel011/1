@@ -3,19 +3,18 @@ from google import genai
 from google.genai import types
 from PIL import Image
 import json
-import os
 
 # Page tab settings
-st.set_page_config(page_title="AI Multi-Engine Marking System", layout="wide")
+st.set_page_config(page_title="AI On-Screen Marking System", layout="wide")
 
-# --- ✨ PREMIUM MODERN MINIMALIST DARK BLUE THEME ---
+# --- ✨ PREMIUM MODERN MINIMALIST DARK THEME (VAPIS PEHLE WAISA) ---
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600&family=Outfit:wght=500;700&display=swap');
     
     .stApp {
-        background-color: #0f172a !important; 
-        color: #cbd5e1 !important; 
+        background-color: #12141c; /* Vapis vahi premium charcoal black background */
+        color: #f1f5f9; 
         font-family: 'Inter', sans-serif;
     }
     
@@ -29,7 +28,7 @@ st.markdown("""
     
     h1 {
         font-family: 'Outfit', sans-serif !important;
-        background: linear-gradient(45deg, #818cf8, #c084fc);
+        background: linear-gradient(45deg, #6366f1, #a855f7);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-size: 2.8rem !important;
@@ -39,30 +38,35 @@ st.markdown("""
     
     h2, h3 {
         font-family: 'Outfit', sans-serif !important;
-        color: #93c5fd !important; 
+        color: #818cf8 !important; 
         font-weight: 600 !important;
     }
     
     label[data-testid="stWidgetLabel"] p {
-        color: #e2e8f0 !important; 
+        color: #f8fafc !important; 
         font-size: 1.05rem !important;
         font-weight: 600 !important;
-        background-color: rgba(129, 140, 248, 0.15); 
+        background-color: rgba(99, 102, 241, 0.15); 
         padding: 4px 10px;
         border-radius: 6px;
         display: inline-block;
         margin-bottom: 8px !important;
-        border: 1px solid rgba(129, 140, 248, 0.3);
+        border: 1px solid rgba(99, 102, 241, 0.3);
     }
     
     div[data-testid="stTextArea"] textarea, 
     div[data-testid="stNumberInput"] input,
     div[data-testid="stFileUploader"] {
-        background-color: #1e293b !important; 
-        color: #e2e8f0 !important; 
-        border: 1px solid #475569 !important;
+        background-color: #1e2230 !important; /* Vahi soft gray-blue tint boxes */
+        color: #ffffff !important; 
+        border: 1px solid #334155 !important;
         border-radius: 10px !important;
         font-size: 1rem !important;
+    }
+    
+    section[data-testid="stSidebar"] {
+        background-color: #0d0f14 !important;
+        border-right: 1px solid #1e293b;
     }
     
     .stButton>button {
@@ -84,22 +88,21 @@ st.markdown("""
     
     div[data-testid="stMetricValue"] {
         font-family: 'Outfit', sans-serif !important;
-        color: #34d399 !important; 
+        color: #10b981 !important; 
         font-size: 3.2rem !important;
         font-weight: 700 !important;
     }
     
     div[data-testid="stExpander"] {
-        background-color: #1e293b !important;
-        border: 1px solid #475569 !important;
+        background-color: #1e2230 !important;
+        border: 1px solid #334155 !important;
         border-radius: 10px !important;
     }
     
     .stAlert {
-        background-color: #1e293b !important;
+        background-color: #1e2230 !important;
         border-left: 5px solid #4f46e5 !important;
         border-radius: 8px;
-        color: #cbd5e1 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -107,24 +110,20 @@ st.markdown("""
 # --- LOADING KEYS FROM SECRETS ---
 gemini_key = st.secrets.get("GEMINI_KEY", None)
 groq_key = st.secrets.get("GROQ_API_KEY", None)
-openai_key = st.secrets.get("OPENAI_API_KEY", None)
 cohere_key = st.secrets.get("COHERE_API_KEY", None)
 
 # --- MAIN UI ---
-st.title("🎯 AI Multi-Engine Marking System")
-st.write("Professional Evaluation Dashboard — Universal Multi-Model Framework")
+st.title("🎯 AI On-Screen Marking System")
+st.write("Professional Evaluation Dashboard — Powered by Advanced AI")
 
-# --- SIDEBAR: MODEL SELECT DROPDOWN ---
-st.sidebar.header("⚙️ AI Engine Configuration")
-ai_provider = st.sidebar.selectbox("Select AI Brain Provider:", 
-                                   ["Google Gemini", "Groq Cloud (Llama 3)", "OpenAI (ChatGPT)", "Cohere API"])
+# --- SIDEBAR: CLEAN DROPDOWN OPTIONS ---
+st.sidebar.header("⚙️ Configuration")
+ai_provider = st.sidebar.selectbox("Select AI Brain Provider:", ["Google Gemini", "Groq Cloud (Llama 3)", "Cohere API"])
 
 if ai_provider == "Google Gemini":
     model_choice = st.sidebar.selectbox("Select Model:", ["gemini-2.5-flash", "gemini-2.5-pro"])
 elif ai_provider == "Groq Cloud (Llama 3)":
     model_choice = st.sidebar.selectbox("Select Model:", ["llama-3.2-11b-vision-preview"])
-elif ai_provider == "OpenAI (ChatGPT)":
-    model_choice = st.sidebar.selectbox("Select Model:", ["gpt-4o-mini", "gpt-4o"])
 elif ai_provider == "Cohere API":
     model_choice = st.sidebar.selectbox("Select Model:", ["command-r-plus"])
 
@@ -179,7 +178,7 @@ with col2:
             user_query = f"[Inputs Data]\n- Question: {question}\n- Max Marks: {max_marks}\n- Official Marking Scheme: {marking_scheme}\n\nEvaluate this sheet using your system guardrails."
             result_json = None
             
-            with st.spinner(f"Processing with {ai_provider} ({model_choice})..."):
+            with st.spinner(f"Analyzing via {ai_provider}..."):
                 try:
                     img_data = Image.open(uploaded_file)
                     
@@ -219,35 +218,8 @@ with col2:
                                 ]
                             )
                             result_json = json.loads(response.choices[0].message.content)
-                    
-                    # --- ENGINE 3: OPENAI ---
-                    elif ai_provider == "OpenAI (ChatGPT)":
-                        if not openai_key:
-                            st.error("🔑 OpenAI API Key missing in Secrets!")
-                        else:
-                            from openai import OpenAI
-                            import base64
-                            import io
-                            
-                            buffered = io.BytesIO()
-                            img_data.save(buffered, format="JPEG")
-                            img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-                            
-                            openai_client = OpenAI(api_key=openai_key)
-                            response = openai_client.chat.completions.create(
-                                model=model_choice,
-                                response_format={"type": "json_object"},
-                                messages=[
-                                    {"role": "system", "content": SYSTEM_PROMPT},
-                                    {"role": "user", "content": [
-                                        {"type": "text", "text": user_query},
-                                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}}
-                                    ]}
-                                ]
-                            )
-                            result_json = json.loads(response.choices[0].message.content)
 
-                    # --- ENGINE 4: COHERE API (Text & Logic Processing) ---
+                    # --- ENGINE 3: COHERE API ---
                     elif ai_provider == "Cohere API":
                         if not cohere_key:
                             st.error("🔑 Cohere API Key missing in Secrets!")
@@ -255,7 +227,6 @@ with col2:
                             import cohere
                             cohere_client = cohere.ClientV2(api_key=cohere_key)
                             
-                            # Cohere text optimization context
                             full_text_prompt = f"{SYSTEM_PROMPT}\n\n[User Content to Evaluate]:\n{user_query}\n\nNote: Please return a strict JSON output matching the requested schema."
                             
                             response = cohere_client.chat(
@@ -265,9 +236,9 @@ with col2:
                             )
                             result_json = json.loads(response.message.content[0].text)
                     
-                    # --- DISPLAY RESULTS IF SUCCESSFUL ---
+                    # --- DISPLAY RESULTS ---
                     if result_json:
-                        st.success(f"Evaluation Completed via {ai_provider}!")
+                        st.success("Evaluation Completed Successfully!")
                         
                         score_col1, score_col2 = st.columns(2)
                         score_col1.metric("MARKS AWARDED", f"{result_json.get('total_marks_awarded')} / {result_json.get('max_marks')}")
