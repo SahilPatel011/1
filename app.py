@@ -3,23 +3,22 @@ from google import genai
 from google.genai import types
 from PIL import Image
 import json
+import os
 
 # Page tab settings
-st.set_page_config(page_title="AI On-Screen Marking System", layout="wide")
+st.set_page_config(page_title="AI Multi-Engine Marking System", layout="wide")
 
 # --- ✨ PREMIUM MODERN MINIMALIST DARK BLUE THEME ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap');
     
-    /* 🎨 Global App Background - Pure Dark Blue */
     .stApp {
-        background-color: #0f172a !important; /* Rich Dark Slate Blue */
-        color: #cbd5e1 !important; /* Soft Light Gray instead of harsh White */
+        background-color: #0f172a !important; 
+        color: #cbd5e1 !important; 
         font-family: 'Inter', sans-serif;
     }
     
-    /* Smooth Transition Animation */
     @keyframes smoothSlide {
         0% { opacity: 0; transform: translateY(6px); }
         100% { opacity: 1; transform: translateY(0); }
@@ -28,7 +27,6 @@ st.markdown("""
         animation: smoothSlide 0.4s ease-out forwards;
     }
     
-    /* Main Title - Soft Elegant Gradient */
     h1 {
         font-family: 'Outfit', sans-serif !important;
         background: linear-gradient(45deg, #818cf8, #c084fc);
@@ -39,19 +37,17 @@ st.markdown("""
         padding-bottom: 10px;
     }
     
-    /* Section Headers - Soft Light Blue */
     h2, h3 {
         font-family: 'Outfit', sans-serif !important;
-        color: #93c5fd !important; /* Beautiful Pastel Light Blue */
+        color: #93c5fd !important; 
         font-weight: 600 !important;
     }
     
-    /* Input Box Labels Customization */
     label[data-testid="stWidgetLabel"] p {
-        color: #e2e8f0 !important; /* Soft Silver White */
+        color: #e2e8f0 !important; 
         font-size: 1.05rem !important;
         font-weight: 600 !important;
-        background-color: rgba(129, 140, 248, 0.15); /* Light Blue Tint */
+        background-color: rgba(129, 140, 248, 0.15); 
         padding: 4px 10px;
         border-radius: 6px;
         display: inline-block;
@@ -59,31 +55,16 @@ st.markdown("""
         border: 1px solid rgba(129, 140, 248, 0.3);
     }
     
-    /* Input Boxes Styling - Matches theme */
     div[data-testid="stTextArea"] textarea, 
     div[data-testid="stNumberInput"] input,
     div[data-testid="stFileUploader"] {
-        background-color: #1e293b !important; /* Deep Navy Blue Box */
-        color: #e2e8f0 !important; /* Soft Light Gray Text inside */
+        background-color: #1e293b !important; 
+        color: #e2e8f0 !important; 
         border: 1px solid #475569 !important;
         border-radius: 10px !important;
         font-size: 1rem !important;
     }
     
-    /* Active Focus Glow */
-    div[data-testid="stTextArea"] textarea:focus, 
-    div[data-testid="stNumberInput"] input:focus {
-        border-color: #818cf8 !important;
-        box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.3) !important;
-    }
-    
-    /* Sidebar Darker Blue Style */
-    section[data-testid="stSidebar"] {
-        background-color: #0b0f19 !important;
-        border-right: 1px solid #1e293b;
-    }
-    
-    /* Premium Action Button */
     .stButton>button {
         background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
         color: #ffffff !important;
@@ -101,22 +82,19 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5) !important;
     }
     
-    /* Emerald Metric Score Display */
     div[data-testid="stMetricValue"] {
         font-family: 'Outfit', sans-serif !important;
-        color: #34d399 !important; /* Elegant Mint Green */
+        color: #34d399 !important; 
         font-size: 3.2rem !important;
         font-weight: 700 !important;
     }
     
-    /* Soft Containers for Expanders */
     div[data-testid="stExpander"] {
         background-color: #1e293b !important;
         border: 1px solid #475569 !important;
         border-radius: 10px !important;
     }
     
-    /* Soft Result Box */
     .stAlert {
         background-color: #1e293b !important;
         border-left: 5px solid #4f46e5 !important;
@@ -126,19 +104,29 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- AUTOMATIC API KEY LOADING FROM SECRETS ---
-try:
-    api_key = st.secrets["GEMINI_KEY"]
-except Exception:
-    api_key = None
+# --- LOADING KEYS FROM SECRETS ---
+gemini_key = st.secrets.get("GEMINI_KEY", None)
+groq_key = st.secrets.get("GROQ_API_KEY", None)
+openai_key = st.secrets.get("OPENAI_API_KEY", None)
+cohere_key = st.secrets.get("COHERE_API_KEY", None)
 
 # --- MAIN UI ---
-st.title("🎯 AI On-Screen Marking System")
-st.write("Professional Evaluation Dashboard — Powered by Gemini AI")
+st.title("🎯 AI Multi-Engine Marking System")
+st.write("Professional Evaluation Dashboard — Universal Multi-Model Framework")
 
-# --- SIDEBAR: CLEAN & MINIMALIST ---
-st.sidebar.header("⚙️ Settings")
-model_choice = st.sidebar.selectbox("Select Model Brain:", ["gemini-2.5-flash", "gemini-2.5-pro"])
+# --- SIDEBAR: MODEL SELECT DROPDOWN ---
+st.sidebar.header("⚙️ AI Engine Configuration")
+ai_provider = st.sidebar.selectbox("Select AI Brain Provider:", 
+                                   ["Google Gemini", "Groq Cloud (Llama 3)", "OpenAI (ChatGPT)", "Cohere API"])
+
+if ai_provider == "Google Gemini":
+    model_choice = st.sidebar.selectbox("Select Model:", ["gemini-2.5-flash", "gemini-2.5-pro"])
+elif ai_provider == "Groq Cloud (Llama 3)":
+    model_choice = st.sidebar.selectbox("Select Model:", ["llama-3.2-11b-vision-preview"])
+elif ai_provider == "OpenAI (ChatGPT)":
+    model_choice = st.sidebar.selectbox("Select Model:", ["gpt-4o-mini", "gpt-4o"])
+elif ai_provider == "Cohere API":
+    model_choice = st.sidebar.selectbox("Select Model:", ["command-r-plus"])
 
 # Core Prompt Logic
 SYSTEM_PROMPT = """
@@ -180,58 +168,119 @@ with col1:
     if uploaded_file:
         st.image(uploaded_file, caption="Uploaded Student Paper", use_container_width=True)
 
-# --- BACKEND EVALUATION EXECUTION ---
+# --- BACKEND MULTI-ENGINE EXECUTION ---
 with col2:
     st.subheader("⚡ Live Evaluation Report")
     
     if st.button("🚀 Run Digital Checking"):
-        if not api_key:
-            st.error("🔑 API Key configuration missing! Please add GEMINI_KEY in Streamlit Cloud Secrets.")
-        elif not uploaded_file:
+        if not uploaded_file:
             st.error("Please upload an image of the student's answer paper.")
         else:
-            with st.spinner("Analyzing handwriting and verification steps..."):
+            user_query = f"[Inputs Data]\n- Question: {question}\n- Max Marks: {max_marks}\n- Official Marking Scheme: {marking_scheme}\n\nEvaluate this sheet using your system guardrails."
+            result_json = None
+            
+            with st.spinner(f"Processing with {ai_provider} ({model_choice})..."):
                 try:
-                    client = genai.Client(api_key=api_key)
                     img_data = Image.open(uploaded_file)
                     
-                    user_query = f"""
-                    [Inputs Data]
-                    - Question: {question}
-                    - Max Marks: {max_marks}
-                    - Official Marking Scheme: {marking_scheme}
+                    # --- ENGINE 1: GOOGLE GEMINI ---
+                    if ai_provider == "Google Gemini":
+                        if not gemini_key:
+                            st.error("🔑 Gemini Key missing in Secrets!")
+                        else:
+                            client = genai.Client(api_key=gemini_key)
+                            config = types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT, response_mime_type="application/json", temperature=0.1)
+                            response = client.models.generate_content(model=model_choice, contents=[img_data, user_query], config=config)
+                            result_json = json.loads(response.text)
                     
-                    Evaluate this sheet using your system guardrails.
-                    """
-                    
-                    config = types.GenerateContentConfig(
-                        system_instruction=SYSTEM_PROMPT,
-                        response_mime_type="application/json",
-                        temperature=0.1
-                    )
-                    
-                    response = client.models.generate_content(
-                        model=model_choice,
-                        contents=[img_data, user_query],
-                        config=config
-                    )
-                    
-                    result_json = json.loads(response.text)
-                    
-                    st.success("Evaluation Completed Successfully!")
-                    
-                    score_col1, score_col2 = st.columns(2)
-                    score_col1.metric("MARKS AWARDED", f"{result_json.get('total_marks_awarded')} / {result_json.get('max_marks')}")
-                    
-                    st.markdown("### 📝 STEP-BY-STEP BREAKDOWN")
-                    for step in result_json.get("step_by_step_breakdown", []):
-                        with st.expander(f"Step {step.get('step_number')}: {step.get('description')} ({step.get('marks_awarded')}/{step.get('marks_allocated')} Marks)"):
-                            st.write(f"**Expected:** {step.get('expected_content')}")
-                            st.write(f"**Student Wrote:** {step.get('student_content')}")
-                            st.info(f"**AI Notes:** {step.get('feedback')}")
+                    # --- ENGINE 2: GROQ CLOUD ---
+                    elif ai_provider == "Groq Cloud (Llama 3)":
+                        if not groq_key:
+                            st.error("🔑 Groq API Key missing in Secrets!")
+                        else:
+                            import groq
+                            import base64
+                            import io
                             
-                    st.markdown("### 🧐 SUMMARY FEEDBACK")
-                    st.info(result_json.get("final_summary"))
+                            buffered = io.BytesIO()
+                            img_data.save(buffered, format="JPEG")
+                            img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+                            
+                            groq_client = groq.Groq(api_key=groq_key)
+                            response = groq_client.chat.completions.create(
+                                model=model_choice,
+                                response_format={"type": "json_object"},
+                                messages=[
+                                    {"role": "system", "content": SYSTEM_PROMPT},
+                                    {"role": "user", "content": [
+                                        {"type": "text", "text": user_query},
+                                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}}
+                                    ]}
+                                ]
+                            )
+                            result_json = json.loads(response.choices[0].message.content)
                     
+                    # --- ENGINE 3: OPENAI ---
+                    elif ai_provider == "OpenAI (ChatGPT)":
+                        if not openai_key:
+                            st.error("🔑 OpenAI API Key missing in Secrets!")
+                        else:
+                            from openai import OpenAI
+                            import base64
+                            import io
+                            
+                            buffered = io.BytesIO()
+                            img_data.save(buffered, format="JPEG")
+                            img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+                            
+                            openai_client = OpenAI(api_key=openai_key)
+                            response = openai_client.chat.completions.create(
+                                model=model_choice,
+                                response_format={"type": "json_object"},
+                                messages=[
+                                    {"role": "system", "content": SYSTEM_PROMPT},
+                                    {"role": "user", "content": [
+                                        {"type": "text", "text": user_query},
+                                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}}
+                                    ]}
+                                ]
+                            )
+                            result_json = json.loads(response.choices[0].message.content)
+
+                    # --- ENGINE 4: COHERE API (Text & Logic Processing) ---
+                    elif ai_provider == "Cohere API":
+                        if not cohere_key:
+                            st.error("🔑 Cohere API Key missing in Secrets!")
+                        else:
+                            import cohere
+                            cohere_client = cohere.ClientV2(api_key=cohere_key)
+                            
+                            # Cohere text optimization context
+                            full_text_prompt = f"{SYSTEM_PROMPT}\n\n[User Content to Evaluate]:\n{user_query}\n\nNote: Please return a strict JSON output matching the requested schema."
+                            
+                            response = cohere_client.chat(
+                                model=model_choice,
+                                response_format={"type": "json_object"},
+                                messages=[{"role": "user", "content": full_text_prompt}]
+                            )
+                            result_json = json.loads(response.message.content[0].text)
+                    
+                    # --- DISPLAY RESULTS IF SUCCESSFUL ---
+                    if result_json:
+                        st.success(f"Evaluation Completed via {ai_provider}!")
+                        
+                        score_col1, score_col2 = st.columns(2)
+                        score_col1.metric("MARKS AWARDED", f"{result_json.get('total_marks_awarded')} / {result_json.get('max_marks')}")
+                        
+                        st.markdown("### 📝 STEP-BY-STEP BREAKDOWN")
+                        for step in result_json.get("step_by_step_breakdown", []):
+                            with st.expander(f"Step {step.get('step_number')}: {step.get('description')} ({step.get('marks_awarded')}/{step.get('marks_allocated')} Marks)"):
+                                st.write(f"**Expected:** {step.get('expected_content')}")
+                                st.write(f"**Student Wrote:** {step.get('student_content')}")
+                                st.info(f"**AI Notes:** {step.get('feedback')}")
+                                
+                        st.markdown("### 🧐 SUMMARY FEEDBACK")
+                        st.info(result_json.get("final_summary"))
+                        
                 except Exception as e:
                     st.error(f"An execution error occurred: {e}")
