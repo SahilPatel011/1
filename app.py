@@ -7,14 +7,15 @@ import json
 # Page tab settings
 st.set_page_config(page_title="AI On-Screen Marking System", layout="wide")
 
-# --- ✨ IMAGE_F2AF60.JPG INSPIRED PREMIUM CHARCOAL & TERRACOTTA THEME ---
+# --- ✨ IMAGE_F2AB05.PNG INSPIRED FUTURISTIC NEON PURPLE THEME ---
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;700&display=swap');
     
+    /* Pitch Black Background like image_f2ab05.png */
     .stApp {
-        background-color: #1a1c23 !important; /* Premium deep charcoal background */
-        color: #e2e8f0 !important; 
+        background-color: #09090b !important; 
+        color: #e4e4e7 !important; 
         font-family: 'Inter', sans-serif;
     }
     
@@ -26,9 +27,12 @@ st.markdown("""
         animation: smoothSlide 0.4s ease-out forwards;
     }
     
+    /* Heading with glowing electric purple gradient effect */
     h1 {
-        font-family: 'Outfit', sans-serif !important;
-        color: #ffffff !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        background: linear-gradient(135deg, #ffffff 60%, #a855f7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         font-size: 2.8rem !important;
         font-weight: 700 !important;
         padding-bottom: 10px;
@@ -36,74 +40,86 @@ st.markdown("""
     }
     
     h2, h3 {
-        font-family: 'Outfit', sans-serif !important;
-        color: #f1f5f9 !important; 
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        color: #f4f4f5 !important; 
         font-weight: 600 !important;
     }
     
+    /* Input Labels customized with deep dark background and neon purple border glow */
     label[data-testid="stWidgetLabel"] p {
-        color: #ffffff !important; 
-        font-size: 1.05rem !important;
+        color: #e9d5ff !important; 
+        font-size: 0.95rem !important;
         font-weight: 600 !important;
-        background-color: rgba(224, 122, 95, 0.12); /* Subtle terracotta glow */
+        background-color: rgba(168, 85, 247, 0.08); 
         padding: 4px 12px;
         border-radius: 6px;
         display: inline-block;
         margin-bottom: 8px !important;
-        border: 1px solid rgba(224, 122, 95, 0.25);
+        border: 1px solid rgba(168, 85, 247, 0.25);
+        box-shadow: 0 0 10px rgba(168, 85, 247, 0.05);
     }
     
+    /* Sleek Cyber Dark Input fields */
     div[data-testid="stTextArea"] textarea, 
     div[data-testid="stNumberInput"] input,
     div[data-testid="stFileUploader"] {
-        background-color: #222531 !important; /* Balanced soft gray-blue container boxes */
+        background-color: #121217 !important; 
         color: #ffffff !important; 
-        border: 1px solid #3a3f52 !important;
+        border: 1px solid #27272a !important;
         border-radius: 10px !important;
         font-size: 1rem !important;
     }
+    div[data-testid="stTextArea"] textarea:focus, 
+    div[data-testid="stNumberInput"] input:focus {
+        border-color: #a855f7 !important;
+        box-shadow: 0 0 10px rgba(168, 85, 247, 0.15) !important;
+    }
     
     section[data-testid="stSidebar"] {
-        background-color: #111318 !important;
-        border-right: 1px solid #222531;
+        background-color: #030303 !important;
+        border-right: 1px solid #18181b;
     }
     
-    /* Terracotta/Burnt Orange Button from the Image */
+    /* Exact Neon Electric Purple/Magenta Button from image_f2ab05.png */
     .stButton>button {
-        background: #d96a43 !important; 
+        background: linear-gradient(135deg, #a855f7, #c084fc) !important; 
         color: #ffffff !important;
         font-weight: 600 !important;
-        font-family: 'Outfit', sans-serif !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
         border: none !important;
-        border-radius: 10px !important;
+        border-radius: 20px !important; /* Rounded pill style like 'Take Free Trial' */
         padding: 12px 24px !important;
-        box-shadow: 0 4px 14px rgba(217, 106, 67, 0.25) !important;
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.4) !important;
         transition: all 0.2s ease !important;
         width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     .stButton>button:hover {
-        background: #e27c56 !important;
         transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(217, 106, 67, 0.4) !important;
+        box-shadow: 0 0 28px rgba(168, 85, 247, 0.6) !important;
+        background: linear-gradient(135deg, #b55fe6, #ca95ff) !important; 
     }
     
+    /* Metric Value highlights matching the layout graphics */
     div[data-testid="stMetricValue"] {
-        font-family: 'Outfit', sans-serif !important;
-        color: #d96a43 !important; /* Metric highlights matched with accent */
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        color: #d8b4fe !important; 
         font-size: 3.2rem !important;
         font-weight: 700 !important;
+        text-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
     }
     
-    /* Clean Cards with Glassmorphism Touch */
+    /* Clean Glassmorphic Style Breakdown Cards */
     div[data-testid="stExpander"] {
-        background-color: #222531 !important;
-        border: 1px solid #3a3f52 !important;
+        background-color: #121217 !important;
+        border: 1px solid #27272a !important;
         border-radius: 10px !important;
     }
     
     .stAlert {
-        background-color: #222531 !important;
-        border-left: 5px solid #d96a43 !important;
+        background-color: #121217 !important;
+        border-left: 5px solid #a855f7 !important;
         border-radius: 8px;
     }
     </style>
@@ -116,10 +132,10 @@ cohere_key = st.secrets.get("COHERE_API_KEY", None)
 
 # --- MAIN UI ---
 st.title("🎯 AI On-Screen Marking System")
-st.write("Professional Evaluation Dashboard — Universal Multi-Engine Framework")
+st.write("Universal Digital Evaluation Framework — High Performance Matrix")
 
 # --- SIDEBAR: CLEAN CONFIGURATION ---
-st.sidebar.header("⚙️ Configuration")
+st.sidebar.header("⚙️ System Control")
 ai_provider = st.sidebar.selectbox("Select AI Brain Provider:", ["Google Gemini", "Groq Cloud (Llama 3)", "Cohere API"])
 
 if ai_provider == "Google Gemini":
@@ -156,7 +172,7 @@ Output MUST be valid JSON data matching this schema:
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    st.subheader("📋 Exam Parameters")
+    st.subheader("📋 Core Parameters")
     question = st.text_area("1. Paste the Exam Question:", 
                             value="An object of mass 2 kg is moving with a velocity of 5 m/s. Calculate its kinetic energy.")
     
@@ -171,7 +187,7 @@ with col1:
 
 # --- BACKEND MULTI-ENGINE EXECUTION ---
 with col2:
-    st.subheader("⚡ Live Evaluation Report")
+    st.subheader("⚡ Live Matrix Analysis")
     
     if st.button("🚀 Run Digital Checking"):
         if not uploaded_file:
@@ -257,3 +273,4 @@ with col2:
                         
                 except Exception as e:
                     st.error(f"An execution error occurred: {e}")
+
