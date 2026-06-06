@@ -10,17 +10,14 @@ st.set_page_config(page_title="AI On-Screen Marking System", layout="wide")
 # --- ✨ PREMIUM MODERN MINIMALIST DARK THEME ---
 st.markdown("""
     <style>
-    /* Google Fonts Import - Clean, Cute & Modern */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap');
     
-    /* Main App Background */
     .stApp {
-        background-color: #12141c; /* Premium Deep Charcoal Black */
-        color: #f1f5f9; /* Clean Off-White for body text */
+        background-color: #12141c;
+        color: #f1f5f9;
         font-family: 'Inter', sans-serif;
     }
     
-    /* Smooth Elegance Animation */
     @keyframes smoothSlide {
         0% { opacity: 0; transform: translateY(6px); }
         100% { opacity: 1; transform: translateY(0); }
@@ -29,7 +26,6 @@ st.markdown("""
         animation: smoothSlide 0.4s ease-out forwards;
     }
     
-    /* Main Headings - Beautiful Indigo & Violet Gradient Highlight */
     h1 {
         font-family: 'Outfit', sans-serif !important;
         background: linear-gradient(45deg, #6366f1, #a855f7);
@@ -42,16 +38,15 @@ st.markdown("""
     
     h2, h3 {
         font-family: 'Outfit', sans-serif !important;
-        color: #818cf8 !important; /* Soft Pastel Indigo */
+        color: #818cf8 !important;
         font-weight: 600 !important;
     }
     
-    /* ⚠️ FIX: Input Box Labels Clarity (Text above inputs) */
     label[data-testid="stWidgetLabel"] p {
-        color: #f8fafc !important; /* Pure crisp white for extreme visibility */
+        color: #f8fafc !important;
         font-size: 1.05rem !important;
         font-weight: 600 !important;
-        background-color: rgba(99, 102, 241, 0.15); /* Light Indigo Highlight behind text */
+        background-color: rgba(99, 102, 241, 0.15);
         padding: 4px 10px;
         border-radius: 6px;
         display: inline-block;
@@ -59,31 +54,16 @@ st.markdown("""
         border: 1px solid rgba(99, 102, 241, 0.3);
     }
     
-    /* 🎨 FIX: Input Boxes Color Change (Soft Gray-Blue tint instead of blinding white) */
     div[data-testid="stTextArea"] textarea, 
     div[data-testid="stNumberInput"] input,
     div[data-testid="stFileUploader"] {
-        background-color: #1e2230 !important; /* Distinct dark gray-blue background */
-        color: #ffffff !important; /* Clear white text inside boxes */
-        border: 1px solid #334155 !important; /* Subtle border */
+        background-color: #1e2230 !important;
+        color: #ffffff !important;
+        border: 1px solid #334155 !important;
         border-radius: 10px !important;
         font-size: 1rem !important;
     }
     
-    /* Active focus effect on Input boxes */
-    div[data-testid="stTextArea"] textarea:focus, 
-    div[data-testid="stNumberInput"] input:focus {
-        border-color: #6366f1 !important;
-        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3) !important;
-    }
-    
-    /* Sidebar Styling */
-    section[data-testid="stSidebar"] {
-        background-color: #0d0f14 !important;
-        border-right: 1px solid #1e293b;
-    }
-    
-    /* Premium Action Button */
     .stButton>button {
         background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
         color: #ffffff !important;
@@ -101,22 +81,19 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5) !important;
     }
     
-    /* Beautiful Emerald Score Card */
     div[data-testid="stMetricValue"] {
         font-family: 'Outfit', sans-serif !important;
-        color: #10b981 !important; /* Clean Emerald Green */
+        color: #10b981 !important;
         font-size: 3.2rem !important;
         font-weight: 700 !important;
     }
     
-    /* Soft Cards for Results & Expanders */
     div[data-testid="stExpander"] {
         background-color: #1e2230 !important;
         border: 1px solid #334155 !important;
         border-radius: 10px !important;
     }
     
-    /* Result Alerts */
     .stAlert {
         background-color: #1e2230 !important;
         border-left: 5px solid #4f46e5 !important;
@@ -125,14 +102,22 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- AUTOMATIC API KEY LOADING FROM SECRETS ---
+# Yeh line automatic Streamlit cloud ke backend se tumhari key utha legi!
+try:
+    api_key = st.secrets["GEMINI_KEY"]
+except Exception:
+    api_key = None
+
 # --- MAIN UI ---
 st.title("🎯 AI On-Screen Marking System")
 st.write("Professional Evaluation Dashboard — Powered by Gemini AI")
 
-# --- SIDEBAR: API KEY SETUP ---
-st.sidebar.header("🔑 Configuration")
-api_key = st.sidebar.text_input("Enter Gemini API Key:", type="password")
+# --- SIDEBAR: CLEAN & SIMPLE ---
+st.sidebar.header("⚙️ Settings")
 model_choice = st.sidebar.selectbox("Select Model Brain:", ["gemini-2.5-flash", "gemini-2.5-pro"])
+st.sidebar.markdown("---")
+st.sidebar.success("🔑 API Key Loaded Automatically!")
 
 # Core Prompt Logic
 SYSTEM_PROMPT = """
@@ -180,7 +165,7 @@ with col2:
     
     if st.button("🚀 Run Digital Checking"):
         if not api_key:
-            st.error("Please enter your Gemini API Key in the sidebar first!")
+            st.error("🔑 API Key configuration missing! Please add GEMINI_KEY in Streamlit Cloud Secrets.")
         elif not uploaded_file:
             st.error("Please upload an image of the student's answer paper.")
         else:
