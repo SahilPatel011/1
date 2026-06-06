@@ -7,14 +7,14 @@ import json
 # Page tab settings
 st.set_page_config(page_title="AI On-Screen Marking System", layout="wide")
 
-# --- ✨ PREMIUM MODERN MINIMALIST DARK THEME (VAPIS PEHLE WAISA) ---
+# --- ✨ IMAGE_F2AF60.JPG INSPIRED PREMIUM CHARCOAL & TERRACOTTA THEME ---
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600&family=Outfit:wght=500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap');
     
     .stApp {
-        background-color: #12141c; /* Vapis vahi premium charcoal black background */
-        color: #f1f5f9; 
+        background-color: #1a1c23 !important; /* Premium deep charcoal background */
+        color: #e2e8f0 !important; 
         font-family: 'Inter', sans-serif;
     }
     
@@ -28,80 +28,82 @@ st.markdown("""
     
     h1 {
         font-family: 'Outfit', sans-serif !important;
-        background: linear-gradient(45deg, #6366f1, #a855f7);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #ffffff !important;
         font-size: 2.8rem !important;
         font-weight: 700 !important;
         padding-bottom: 10px;
+        letter-spacing: -0.5px;
     }
     
     h2, h3 {
         font-family: 'Outfit', sans-serif !important;
-        color: #818cf8 !important; 
+        color: #f1f5f9 !important; 
         font-weight: 600 !important;
     }
     
     label[data-testid="stWidgetLabel"] p {
-        color: #f8fafc !important; 
+        color: #ffffff !important; 
         font-size: 1.05rem !important;
         font-weight: 600 !important;
-        background-color: rgba(99, 102, 241, 0.15); 
-        padding: 4px 10px;
+        background-color: rgba(224, 122, 95, 0.12); /* Subtle terracotta glow */
+        padding: 4px 12px;
         border-radius: 6px;
         display: inline-block;
         margin-bottom: 8px !important;
-        border: 1px solid rgba(99, 102, 241, 0.3);
+        border: 1px solid rgba(224, 122, 95, 0.25);
     }
     
     div[data-testid="stTextArea"] textarea, 
     div[data-testid="stNumberInput"] input,
     div[data-testid="stFileUploader"] {
-        background-color: #1e2230 !important; /* Vahi soft gray-blue tint boxes */
+        background-color: #222531 !important; /* Balanced soft gray-blue container boxes */
         color: #ffffff !important; 
-        border: 1px solid #334155 !important;
+        border: 1px solid #3a3f52 !important;
         border-radius: 10px !important;
         font-size: 1rem !important;
     }
     
     section[data-testid="stSidebar"] {
-        background-color: #0d0f14 !important;
-        border-right: 1px solid #1e293b;
+        background-color: #111318 !important;
+        border-right: 1px solid #222531;
     }
     
+    /* Terracotta/Burnt Orange Button from the Image */
     .stButton>button {
-        background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+        background: #d96a43 !important; 
         color: #ffffff !important;
         font-weight: 600 !important;
         font-family: 'Outfit', sans-serif !important;
         border: none !important;
         border-radius: 10px !important;
         padding: 12px 24px !important;
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+        box-shadow: 0 4px 14px rgba(217, 106, 67, 0.25) !important;
         transition: all 0.2s ease !important;
         width: 100%;
     }
     .stButton>button:hover {
+        background: #e27c56 !important;
         transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5) !important;
+        box-shadow: 0 6px 20px rgba(217, 106, 67, 0.4) !important;
     }
     
     div[data-testid="stMetricValue"] {
         font-family: 'Outfit', sans-serif !important;
-        color: #10b981 !important; 
+        color: #d96a43 !important; /* Metric highlights matched with accent */
         font-size: 3.2rem !important;
         font-weight: 700 !important;
     }
     
+    /* Clean Cards with Glassmorphism Touch */
     div[data-testid="stExpander"] {
-        background-color: #1e2230 !important;
-        border: 1px solid #334155 !important;
+        background-color: #222531 !important;
+        border: 1px solid #3a3f52 !important;
         border-radius: 10px !important;
     }
     
     .stAlert {
-        background-color: #1e2230 !important;
-        border-left: 5px solid #4f46e5 !important;
+        background-color: #222531 !important;
+        border-left: 5px solid #d96a43 !important;
         border-radius: 8px;
     }
     </style>
@@ -114,9 +116,9 @@ cohere_key = st.secrets.get("COHERE_API_KEY", None)
 
 # --- MAIN UI ---
 st.title("🎯 AI On-Screen Marking System")
-st.write("Professional Evaluation Dashboard — Powered by Advanced AI")
+st.write("Professional Evaluation Dashboard — Universal Multi-Engine Framework")
 
-# --- SIDEBAR: CLEAN DROPDOWN OPTIONS ---
+# --- SIDEBAR: CLEAN CONFIGURATION ---
 st.sidebar.header("⚙️ Configuration")
 ai_provider = st.sidebar.selectbox("Select AI Brain Provider:", ["Google Gemini", "Groq Cloud (Llama 3)", "Cohere API"])
 
