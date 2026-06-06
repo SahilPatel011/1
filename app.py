@@ -87,7 +87,7 @@ st.markdown("""
         font-weight: 600 !important;
         font-family: 'Plus Jakarta Sans', sans-serif !important;
         border: none !important;
-        border-radius: 20px !important; /* Rounded pill style like 'Take Free Trial' */
+        border-radius: 20px !important; 
         padding: 12px 24px !important;
         box-shadow: 0 0 20px rgba(168, 85, 247, 0.4) !important;
         transition: all 0.2s ease !important;
@@ -206,6 +206,10 @@ with col2:
                 try:
                     img_data = Image.open(uploaded_file)
                     
+                    # 🛠️ BUG FIX: Convert RGBA/PNG images to RGB to prevent JPEG compression crashes
+                    if img_data.mode in ("RGBA", "P"):
+                        img_data = img_data.convert("RGB")
+                    
                     # --- ENGINE 1: GOOGLE GEMINI ---
                     if ai_provider == "Google Gemini":
                         if not gemini_key:
@@ -226,7 +230,7 @@ with col2:
                             import io
                             
                             buffered = io.BytesIO()
-                            img_data.save(buffered, format="JPEG")
+                            img_data.save(buffered, format="JPEG") # Now safe from RGBA error!
                             img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
                             
                             groq_client = groq.Groq(api_key=groq_key)
@@ -262,7 +266,6 @@ with col2:
                     
                     # --- DISPLAY RESULTS ---
                     if result_json:
-                        # Check if AI triggered the error guardrail
                         summary_text = result_json.get("final_summary", "")
                         if "ERROR:" in summary_text:
                             st.error(summary_text)
@@ -287,4 +290,4 @@ with col2:
                         
                 except Exception as e:
                     st.error(f"An execution error occurred: {e}")
-
+                    
